@@ -17,7 +17,7 @@
 # Do not use urllib's HTTP GET and POST mechanisms.
 # Write your own HTTP GET and POST
 # The point is to understand what you have to send and get experience with it
-
+import os
 import sys
 import socket
 import re
@@ -70,11 +70,48 @@ class HTTPClient(object):
     def GET(self, url, args=None):
         code = 500
         body = ""
+        current_directory = os.path.dirname(__file__)
+        directory_contents = os.listdir(current_directory)
+        directories = [item for item in directory_contents if os.path.isdir(os.path.join(current_directory, item))]
+        url_parts = urllib.parse.urlparse(url)
+        host = url_parts.netloc
+        path = url_parts.path
+        # print("url------------")
+        file=path.split('/')[1]
+        # print(file)
+        if file not in directory_contents:
+            code = 404
+            body = None
+            return HTTPResponse(code, body)
+        # print(url)
+        # print(directory_contents)
+        # print("chat----------")
+        # print(host)
+        # print(path)
+
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
         code = 500
         body = ""
+        current_directory = os.path.dirname(__file__)
+        directory_contents = os.listdir(current_directory)
+        directories = [item for item in directory_contents if os.path.isdir(os.path.join(current_directory, item))]
+        url_parts = urllib.parse.urlparse(url)
+        host = url_parts.netloc
+        path = url_parts.path
+        # print("url------------")
+        file=path.split('/')[1]
+        # print(file)
+        if file not in directory_contents:
+            code = 404
+            body = None
+            return HTTPResponse(code, body)
+        # print(url)
+        # print(directory_contents)
+        # print("chat----------")
+        # print(host)
+        # print(path)
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
