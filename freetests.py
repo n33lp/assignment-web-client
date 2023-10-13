@@ -155,21 +155,21 @@ class TestHTTPClient(unittest.TestCase):
 
 
 
-    # def test404GET(self):
-    #     '''Test against 404 errors'''
-    #     MyHTTPHandler.get = nothing_available
-    #     http = httpclass.HTTPClient()
-    #     req = http.GET("http://%s:%d/49872398432" % (BASEHOST,BASEPORT) )
-    #     self.assertTrue(req != None, "None Returned!")
-    #     self.assertTrue(req.code == 404)
+    def test404GET(self):
+        '''Test against 404 errors'''
+        MyHTTPHandler.get = nothing_available
+        http = httpclass.HTTPClient()
+        req = http.GET("http://%s:%d/49872398432" % (BASEHOST,BASEPORT) )
+        self.assertTrue(req != None, "None Returned!")
+        self.assertTrue(req.code == 404)
 
-    # def test404POST(self):
-    #     '''Test against 404 errors'''
-    #     MyHTTPHandler.post = nothing_available
-    #     http = httpclass.HTTPClient()
-    #     req = http.POST("http://%s:%d/49872398432" % (BASEHOST,BASEPORT) )
-    #     self.assertTrue(req != None, "None Returned!")
-    #     self.assertTrue(req.code == 404)
+    def test404POST(self):
+        '''Test against 404 errors'''
+        MyHTTPHandler.post = nothing_available
+        http = httpclass.HTTPClient()
+        req = http.POST("http://%s:%d/49872398432" % (BASEHOST,BASEPORT) )
+        self.assertTrue(req != None, "None Returned!")
+        self.assertTrue(req.code == 404)
 
     def testGET(self):
         '''Test HTTP GET'''
@@ -183,31 +183,31 @@ class TestHTTPClient(unittest.TestCase):
         self.assertTrue(req.code == 200)
         self.assertTrue(req.body.find(path)>=0, "Data: [%s] " % req.body)
 
-    # def testGETHeaders(self):
-    #     '''Test HTTP GET Headers'''
-    #     MyHTTPHandler.get = header_check
-    #     MyHTTPHandler.post = die_on_method
-    #     http = httpclass.HTTPClient()
-    #     path = "abcdef/gjkd/dsadas"
-    #     url = "http://%s:%d/%s" % (BASEHOST,BASEPORT, path)
-    #     req = http.GET( url )
-    #     self.assertTrue(req != None, "None Returned!")
-    #     self.assertTrue(req.code == 200)
+    def testGETHeaders(self):
+        '''Test HTTP GET Headers'''
+        MyHTTPHandler.get = header_check
+        MyHTTPHandler.post = die_on_method
+        http = httpclass.HTTPClient()
+        path = "abcdef/gjkd/dsadas"
+        url = "http://%s:%d/%s" % (BASEHOST,BASEPORT, path)
+        req = http.GET( url )
+        self.assertTrue(req != None, "None Returned!")
+        self.assertTrue(req.code == 200)
 
-    # def testPOSTHeaders(self):
-    #     '''Test HTTP POST Headers'''
-    #     MyHTTPHandler.post = post_header_check
-    #     MyHTTPHandler.get  = die_on_method
-    #     http = httpclass.HTTPClient()
-    #     path = "abcdef/gjkd/dsadas"
-    #     url = "http://%s:%d/%s" % (BASEHOST,BASEPORT, path)
-    #     req = http.POST( url )
-    #     self.assertTrue(req != None, "None Returned!")
-    #     self.assertTrue(req.code == 200,"Code is %s but I wanted a 200 OK" % req.code)
+    def testPOSTHeaders(self):
+        '''Test HTTP POST Headers'''
+        MyHTTPHandler.post = post_header_check
+        MyHTTPHandler.get  = die_on_method
+        http = httpclass.HTTPClient()
+        path = "abcdef/gjkd/dsadas"
+        url = "http://%s:%d/%s" % (BASEHOST,BASEPORT, path)
+        req = http.POST( url )
+        self.assertTrue(req != None, "None Returned!")
+        self.assertTrue(req.code == 200,"Code is %s but I wanted a 200 OK" % req.code)
 
         
         
-    # # consider disabling this test until everything else works
+    # consider disabling this test until everything else works
     # def testInternetGets(self):
     #     '''Test HTTP Get in the wild, these webservers are far less
     #        forgiving'''

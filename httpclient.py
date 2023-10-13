@@ -17,7 +17,7 @@
 # Do not use urllib's HTTP GET and POST mechanisms.
 # Write your own HTTP GET and POST
 # The point is to understand what you have to send and get experience with it
-import os
+
 import sys
 import socket
 import re
@@ -41,13 +41,16 @@ class HTTPClient(object):
         return None
 
     def get_code(self, data):
-        return None
+        data_breakdown=data.split()
+        code = data_breakdown[1]
+        return int(code)
 
     def get_headers(self,data):
         return None
 
     def get_body(self, data):
-        return None
+        body = data.split("\r\n\r\n")[1]
+        return body
     
     def sendall(self, data):
         self.socket.sendall(data.encode('utf-8'))
@@ -67,51 +70,56 @@ class HTTPClient(object):
                 done = not part
         return buffer.decode('utf-8')
 
+    '''
+    GET /path/to/resource HTTP/1.1
+    Host: www.example.com
+    User-Agent: MyHttpClient/1.0
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+    Accept-Language: en-US,en;q=0.5
+    Connection: keep-alive
+    '''
+    '''
+    GET /path/to/resource HTTP/1.1\r\nHost: www.example.com\r\nUser-Agent: MyHttpClient/1.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.5\r\nConnection: keep-alive\r\n\r\n
+    '''
+
     def GET(self, url, args=None):
         code = 500
         body = ""
-        current_directory = os.path.dirname(__file__)
-        directory_contents = os.listdir(current_directory)
-        directories = [item for item in directory_contents if os.path.isdir(os.path.join(current_directory, item))]
-        url_parts = urllib.parse.urlparse(url)
-        host = url_parts.netloc
-        path = url_parts.path
-        # print("url------------")
-        file=path.split('/')[1]
-        # print(file)
-        if file not in directory_contents:
-            code = 404
-            body = None
-            return HTTPResponse(code, body)
-        # print(url)
-        # print(directory_contents)
-        # print("chat----------")
-        # print(host)
-        # print(path)
-
+        asked_url=urllib.parse.urlparse(url)
+        path = asked_url.path
+        host = asked_url.hostname
+        port = asked_url.port 
+        scheme = asked_url.scheme
+        self.connect(host,port)
+        if scheme == 'http' or scheme == 'https':
+            request= 'GET '+path+' '+'HTTP/1.1\r\nHost: '+host+'\r\nConnection: close\r\n\r\n'
+        self.sendall(request)
+        response = self.recvall(self.socket)
+        code = self.get_code(response)
+        body = self.get_body(response)
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
         code = 500
         body = ""
-        current_directory = os.path.dirname(__file__)
-        directory_contents = os.listdir(current_directory)
-        directories = [item for item in directory_contents if os.path.isdir(os.path.join(current_directory, item))]
-        url_parts = urllib.parse.urlparse(url)
-        host = url_parts.netloc
-        path = url_parts.path
-        # print("url------------")
-        file=path.split('/')[1]
-        # print(file)
-        if file not in directory_contents:
-            code = 404
-            body = None
-            return HTTPResponse(code, body)
-        # print(url)
-        # print(directory_contents)
-        # print("chat----------")
-        # print(host)
-        # print(path)
+        asked_url=urllib.parse.urlparse(url)
+        if args:
+            body_message = urllib.parse.urlencode(args)
+        else:
+            body_message = ' '
+        len_body=len(body_message)
+        path = asked_url.path
+        host = asked_url.hostname
+        port = asked_url.port 
+        scheme = asked_url.scheme
+        self.connect(host,port)
+        if scheme == 'http' or scheme == 'https':
+            request = 'POST ' + path + ' HTTP/1.1\r\nHost: ' + host + '\r\nContent-Length: ' + str(len_body) + "\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: close\r\n\r\n"
+            request += str(body_message)
+        self.sendall(request)
+        data = self.recvall(self.socket)
+        code = self.get_code(data)
+        body = self.get_body(data)
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
