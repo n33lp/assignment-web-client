@@ -86,13 +86,20 @@ class HTTPClient(object):
         code = 500
         body = ""
         asked_url=urllib.parse.urlparse(url)
-        path = asked_url.path
         host = asked_url.hostname
-        port = asked_url.port 
+        port = asked_url.port or 80
+        path = asked_url.path or '/'
         scheme = asked_url.scheme
         self.connect(host,port)
+        request='GET'
         if scheme == 'http' or scheme == 'https':
-            request= 'GET '+path+' '+'HTTP/1.1\r\nHost: '+host+'\r\nConnection: close\r\n\r\n'
+            request += ' '
+            request += path
+            request += ' '
+            request += 'HTTP/1.1\r\nHost: '
+            request += host
+            request += '\r\n'
+            request += "Connection: close\r\n\r\n"
         self.sendall(request)
         response = self.recvall(self.socket)
         code = self.get_code(response)
@@ -107,14 +114,16 @@ class HTTPClient(object):
             body_message = urllib.parse.urlencode(args)
         else:
             body_message = ' '
-        len_body=len(body_message)
-        path = asked_url.path
         host = asked_url.hostname
-        port = asked_url.port 
+        port = asked_url.port or 80
+        path = asked_url.path or '/'
         scheme = asked_url.scheme
         self.connect(host,port)
         if scheme == 'http' or scheme == 'https':
-            request = 'POST ' + path + ' HTTP/1.1\r\nHost: ' + host + '\r\nContent-Length: ' + str(len_body) + "\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: close\r\n\r\n"
+            request = 'POST ' + path + ' HTTP/1.1\r\nHost: ' + host + '\r\n'
+            request += "Content-Length: " + str(len(body_message)) + "\r\n"
+            request += "Content-Type: application/x-www-form-urlencoded\r\n"
+            request += "Connection: close\r\n\r\n"
             request += str(body_message)
         self.sendall(request)
         data = self.recvall(self.socket)
