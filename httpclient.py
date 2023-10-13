@@ -85,14 +85,16 @@ class HTTPClient(object):
     def GET(self, url, args=None):
         code = 500
         body = ""
+        #get an object withall the things needed
         asked_url=urllib.parse.urlparse(url)
-        host = asked_url.hostname
-        port = asked_url.port or 80
-        path = asked_url.path or '/'
-        scheme = asked_url.scheme
-        self.connect(host,port)
-        request='GET'
-        if scheme == 'http' or scheme == 'https':
+        host = asked_url.hostname #gets the host
+        port = asked_url.port or 80 #get the port, if non that sets to 90
+        path = asked_url.path or '/' #gets the path, if non than its /
+        scheme = asked_url.scheme # get the scheme
+        self.connect(host,port) #connects
+        request='GET' # starts making request
+        if scheme == 'http' or scheme == 'https': #validates
+            #starts making request
             request += ' '
             request += path
             request += ' '
@@ -100,35 +102,46 @@ class HTTPClient(object):
             request += host
             request += '\r\n'
             request += "Connection: close\r\n\r\n"
+        #sends it
         self.sendall(request)
+        #gets response
         response = self.recvall(self.socket)
+        #gets code
         code = self.get_code(response)
+        #gets body
         body = self.get_body(response)
         return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
         code = 500
         body = ""
+        #get an object withall the things needed
         asked_url=urllib.parse.urlparse(url)
-        if args:
-            body_message = urllib.parse.urlencode(args)
+        if args: #checks if the args is none if not adds a blank ' '
+            message_body = urllib.parse.urlencode(args) #if there is an arg parse and save as message body
         else:
-            body_message = ' '
-        host = asked_url.hostname
-        port = asked_url.port or 80
-        path = asked_url.path or '/'
-        scheme = asked_url.scheme
+            message_body = ' '
+        host = asked_url.hostname #gets the host
+        port = asked_url.port or 80 #get the port, if non that sets to 90
+        path = asked_url.path or '/' #gets the path, if non than its /
+        scheme = asked_url.scheme # get the scheme
         self.connect(host,port)
-        if scheme == 'http' or scheme == 'https':
+        if scheme == 'http' or scheme == 'https': #validates
+            #starts making request
             request = 'POST ' + path + ' HTTP/1.1\r\nHost: ' + host + '\r\n'
-            request += "Content-Length: " + str(len(body_message)) + "\r\n"
+            request += "Content-Length: " + str(len(message_body)) + "\r\n"
             request += "Content-Type: application/x-www-form-urlencoded\r\n"
             request += "Connection: close\r\n\r\n"
-            request += str(body_message)
+            request += str(message_body)
+        
+        #sends it
         self.sendall(request)
-        data = self.recvall(self.socket)
-        code = self.get_code(data)
-        body = self.get_body(data)
+        #gets response
+        response = self.recvall(self.socket)
+        #gets code
+        code = self.get_code(response)
+        #gets body
+        body = self.get_body(response)
         return HTTPResponse(code, body)
 
     def command(self, url, command="GET", args=None):
